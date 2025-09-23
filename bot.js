@@ -7,7 +7,7 @@ app.use(express.json());
 
 // Initialize Sheets API
 const sheets = new GoogleSheetsAPI(
-    process.env.GOOGLE_SHEETS_ID ,
+    process.env.GOOGLE_SHEETS_ID,
     process.env.GOOGLE_API_KEY
 );
 
@@ -40,23 +40,24 @@ async function generateMainMenu() {
         
         return menuText;
     } catch (error) {
-        console.error('Menu generation error:', error);
+        console.error('Menu generation error:', error.message, error.stack);
         return "🍟 *WELCOME TO UNCLE'S FRIES!* 🍗\n\nPlease type 'menu' to see our offerings!";
     }
 }
 
-// Send WhatsApp message function
+// Send WhatsApp message function (FIXED: no double whatsapp: prefix)
 async function sendWhatsAppMessage(to, message) {
     try {
         const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
         await client.messages.create({
             body: message,
             from: `whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER}`,
-            to: `whatsapp:${to}`
+            to: to // Already in 'whatsapp:+234...' format from req.body.From
         });
         console.log('✅ Message sent to:', to);
     } catch (error) {
-        console.error('❌ Twilio error:', error.message);
+        console.error('❌ Twilio error:', error.message, error.code, error.stack);
+        throw error; // Bubble up for webhook to handle
     }
 }
 
@@ -82,6 +83,7 @@ async function generateCategoryMenu(categoryIndex) {
         
         return menuText;
     } catch (error) {
+        console.error('Category menu error:', error.message, error.stack);
         return "❌ Sorry, couldn't load menu items. Please try again.";
     }
 }
@@ -143,11 +145,11 @@ app.get('/test-menu', async (req, res) => {
     }
 });
 
-// WhatsApp webhook endpoint - FIXED VERSION (NO DUPLICATES)
+// WhatsApp webhook endpoint
 app.post('/webhook', async (req, res) => {
-    console.log('📱 WhatsApp message from:', req.body.From);
+    console.log('📱 WhatsApp message from:', req.body.From, 'Body:', req.body.Body);
     
-    const from = req.body.From;
+    const from = req.body.From; // Already in 'whatsapp:+234...' format
     const message = req.body.Body;
 
     // Immediate empty response to Twilio (required)
@@ -156,6 +158,10 @@ app.post('/webhook', async (req, res) => {
 
     // Process message in background
     try {
+        if (!from || !message) {
+            console.error('Invalid webhook payload:', req.body);
+            return;
+        }
         if (message.toLowerCase().includes('hi') || message.toLowerCase().includes('menu')) {
             const menu = await generateMainMenu();
             await sendWhatsAppMessage(from, menu);
@@ -168,13 +174,13 @@ app.post('/webhook', async (req, res) => {
             );
         }
     } catch (error) {
-        console.error('Webhook error:', error);
+        console.error('Webhook error:', error.message, error.stack);
     }
 });
 
 // Error handling
 app.use((err, req, res, next) => {
-    console.error('❌ Server error:', err);
+    console.error('❌ Server error:', err.message, err.stack);
     res.status(500).json({ error: 'Internal server error' });
 });
 
@@ -194,7 +200,7 @@ app.listen(PORT, () => {
     ✅ POST /webhook   - WhatsApp webhook
     
     🔜 Next Steps:
-    1. Add Twilio credentials to Railway
+    1. Verify Twilio credentials in Railway
     2. Set webhook in Twilio sandbox
     3. Test with WhatsApp messages!
     `);
