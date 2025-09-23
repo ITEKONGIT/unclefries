@@ -1,0 +1,19 @@
+{
+  "name": "uncles-fries-bot",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "WhatsApp Ordering Bot for Uncle's Fries",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node bot.js",
+    "dev": "node bot.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "axios": "^1.6.0",
+    "twilio": "^4.19.0"
+  },
+  "keywords": ["whatsapp", "bot", "ordering", "nigeria"],
+  "author": "Uncle's Fries",
+  "license": "MIT"
+}
