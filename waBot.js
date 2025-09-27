@@ -1,5 +1,6 @@
-import makeWASocket, { useMultiFileAuthState, DisconnectReason } from "@whiskeysockets/baileys"
+import makeWASocket, { useMultiFileAuthState } from "@whiskeysockets/baileys"
 import P from "pino"
+import qrcode from "qrcode-terminal"
 import axios from "axios"
 import GoogleSheetsAPI from "./sheets.js"
 
@@ -8,35 +9,53 @@ const userState = {}
 const sheets = new GoogleSheetsAPI(process.env.SHEET_ID, process.env.SHEET_API_KEY)
 
 export async function startBot() {
-  const { state, saveCreds } = await useMultiFileAuthState("auth")
+  // Persistent auth in Railway volume
+  const { state, saveCreds } = await useMultiFileAuthState("/app/auth")
 
   sock = makeWASocket({
     auth: state,
     logger: P({ level: "silent" }),
-    printQRInTerminal: true
+    printQRInTerminal: false
   })
 
+  // Save creds when they change
   sock.ev.on("creds.update", saveCreds)
+
+  // QR + connection handling
   sock.ev.on("connection.update", (update) => {
-    if (update.connection === "open") console.log("✅ Bot connected to WhatsApp!")
+    const { connection, qr } = update
+    if (qr) {
+      console.log("📱 Scan this QR to log in:")
+      qrcode.generate(qr, { small: true })
+    }
+    if (connection === "open") console.log("✅ Bot connected to WhatsApp!")
   })
 
+  // Message handler
   sock.ev.on("messages.upsert", async ({ messages }) => {
     const msg = messages[0]
     if (!msg.message || msg.key.fromMe) return
 
     const from = msg.key.remoteJid
-    const text = msg.message.conversation?.trim().toLowerCase()
+    const text =
+      msg.message.conversation ||
+      msg.message.extendedTextMessage?.text ||
+      ""
+    const cleanText = text.trim().toLowerCase()
 
     if (!userState[from]) {
       userState[from] = { step: "init", cart: [] }
-      await sendWhatsAppMessage(from, "👋 Welcome to UncleFries!\nType *menu* to see items.")
+      await sendWhatsAppMessage(
+        from,
+        "👋 Welcome to UncleFries!\nType *menu* to see items."
+      )
       return
     }
 
     const state = userState[from]
 
-    if (text === "menu") {
+    // Show menu
+    if (cleanText === "menu") {
       const rows = await sheets.getSheetData("Sheet2")
       const menu = sheets.parseMenuData(rows)
       let menuText = "🍟 *UncleFries Menu* 🍟\n\n"
@@ -50,40 +69,72 @@ export async function startBot() {
       return
     }
 
+    // Ordering step
     if (state.step === "ordering") {
-      const choice = parseInt(text)
+      const choice = parseInt(cleanText)
       if (!isNaN(choice) && state.menu[choice - 1]) {
         state.cart.push(state.menu[choice - 1])
-        await sendWhatsAppMessage(from, `✅ Added *${state.menu[choice - 1].item_name}*.\nType *checkout* or pick another.`)
+        await sendWhatsAppMessage(
+          from,
+          `✅ Added *${state.menu[choice - 1].item_name}*.\nType *checkout* or pick another.`
+        )
       } else {
         await sendWhatsAppMessage(from, "❌ Invalid choice.")
       }
       return
     }
 
-    if (text === "checkout") {
+    // Checkout step
+    if (cleanText === "checkout") {
       state.step = "address"
       await sendWhatsAppMessage(from, "📍 Send me your delivery address:")
       return
     }
 
+    // Address collection
     if (state.step === "address") {
-      state.address = msg.message.conversation
-      const total = state.cart.reduce((sum, item) => sum + parseInt(item.price), 0)
+      state.address = text
+      const total = state.cart.reduce(
+        (sum, item) => sum + parseInt(item.price),
+        0
+      )
 
       try {
-        const res = await axios.post("https://api.paystack.co/transaction/initialize", {
-          email: `cust_${from}@unclefries.com`,
-          amount: total * 100,
-          callback_url: "https://yourdomain.com/api/paystack/webhook"
-        }, {
-          headers: { Authorization: `Bearer ${process.env.PAYSTACK_SECRET}` }
-        })
+        const res = await axios.post(
+          "https://api.paystack.co/transaction/initialize",
+          {
+            email: `cust_${from.replace(/[@.]/g, "_")}@unclefries.com`,
+            amount: total * 100,
+            callback_url: `${process.env.BASE_URL}/api/paystack/webhook`
+          },
+          {
+            headers: { Authorization: `Bearer ${process.env.PAYSTACK_SECRET}` }
+          }
+        )
 
-        await sendWhatsAppMessage(from, `💰 Total ₦${total}\nPay here: ${res.data.data.authorization_url}`)
+        // Payment link to customer
+        await sendWhatsAppMessage(
+          from,
+          `💰 Total ₦${total}\nPay here: ${res.data.data.authorization_url}`
+        )
+
+        // Notify admin
+        if (process.env.ADMIN_WAID) {
+          await sendWhatsAppMessage(
+            process.env.ADMIN_WAID,
+            `📦 New order from ${from}\nItems: ${state.cart
+              .map((i) => i.item_name)
+              .join(", ")}\nTotal: ₦${total}\nAddress: ${state.address}`
+          )
+        }
+
         state.step = "paid"
       } catch (e) {
-        await sendWhatsAppMessage(from, "❌ Payment link failed.")
+        console.error("❌ Paystack Error:", e.response?.data || e.message)
+        await sendWhatsAppMessage(
+          from,
+          "❌ Payment link failed, please try again later."
+        )
       }
     }
   })
