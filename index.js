@@ -6,6 +6,7 @@ import { sendWhatsAppMessage, startBot } from "./waBot.js"
 const app = express()
 app.use(bodyParser.json())
 
+// ✅ Paystack webhook
 app.post("/api/paystack/webhook", (req, res) => {
   const secret = process.env.PAYSTACK_SECRET
   const hash = crypto
@@ -31,7 +32,11 @@ app.post("/api/paystack/webhook", (req, res) => {
   res.sendStatus(200)
 })
 
+// ✅ Root check
+app.get("/", (req, res) => res.send("🚀 UncleFries Bot is running!"))
+
+// ✅ Start bot with Express app (for /qr endpoint)
+startBot(app)
+
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => console.log(`🚀 Server running on ${PORT}`))
-
-startBot()
