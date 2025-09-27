@@ -2,12 +2,16 @@ import makeWASocket, { useMultiFileAuthState } from "@whiskeysockets/baileys"
 import P from "pino"
 import qrcode from "qrcode"
 import axios from "axios"
+import { Octokit } from "@octokit/rest"
 import GoogleSheetsAPI from "./sheets.js"
 
 let sock
 let latestQR = null
 const userState = {}
 const sheets = new GoogleSheetsAPI(process.env.SHEET_ID, process.env.SHEET_API_KEY)
+
+// ✅ GitHub client
+const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN })
 
 export async function startBot(app) {
   // Persistent auth in Railway volume
@@ -23,11 +27,36 @@ export async function startBot(app) {
   sock.ev.on("creds.update", saveCreds)
 
   // QR + connection handling
-  sock.ev.on("connection.update", (update) => {
+  sock.ev.on("connection.update", async (update) => {
     const { connection, qr } = update
     if (qr) {
       latestQR = qr
-      console.log("📱 New QR generated (scan via /qr endpoint)")
+      console.log("📱 New QR generated (scan via /qr or check GitHub)")
+
+      try {
+        const qrImage = await qrcode.toBuffer(qr, { type: "png" })
+        const content = qrImage.toString("base64")
+
+        // ✅ Upload qr.png to GitHub repo
+        await octokit.repos.createOrUpdateFileContents({
+          owner: process.env.GITHUB_USER,
+          repo: process.env.GITHUB_REPO,
+          path: "qr.png",
+          message: "Update WhatsApp QR",
+          content,
+          committer: {
+            name: "UncleFries Bot",
+            email: "bot@unclefries.com"
+          },
+          author: {
+            name: "UncleFries Bot",
+            email: "bot@unclefries.com"
+          }
+        })
+        console.log("✅ QR pushed to GitHub successfully")
+      } catch (err) {
+        console.error("❌ QR upload error:", err.message)
+      }
     }
     if (connection === "open") console.log("✅ Bot connected to WhatsApp!")
   })
