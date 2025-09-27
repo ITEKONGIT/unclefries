@@ -5,8 +5,8 @@
   "description": "WhatsApp Ordering Bot for Uncle's Fries",
   "main": "waBot.js",
   "scripts": {
-    "start": "node wabot.js",
-    "dev": "nodemon wabot.js"
+    "start": "node waBot.js",
+    "dev": "nodemon waBot.js"
   },
   "dependencies": {
     "@whiskeysockets/baileys": "^6.7.7",
@@ -24,4 +24,5 @@
   "author": "Uncle's Fries",
   "license": "MIT"
 }
+
 
