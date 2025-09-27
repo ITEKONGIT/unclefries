@@ -13,7 +13,7 @@
     "axios": "^1.7.2",
     "express": "^4.18.2",
     "pino": "^8.14.1",
-    "qrcode-terminal": "^0.12.0"
+    "qrcode-terminal": "^0.12.0",
     "qrcode": "^1.5.4"
   },
   "keywords": [
@@ -25,6 +25,7 @@
   "author": "Uncle's Fries",
   "license": "MIT"
 }
+
 
 
 
