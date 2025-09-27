@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "description": "WhatsApp Ordering Bot for Uncle's Fries",
-  "main": "wabot.js",
+  "main": "waBot.js",
   "scripts": {
     "start": "node wabot.js",
     "dev": "nodemon wabot.js"
@@ -24,3 +24,4 @@
   "author": "Uncle's Fries",
   "license": "MIT"
 }
+
