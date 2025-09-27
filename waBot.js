@@ -8,7 +8,7 @@ import GoogleSheetsAPI from "./sheets.js"
 let sock
 let latestQR = null
 const userState = {}
-const sheets = new GoogleSheetsAPI(process.env.SHEET_ID, process.env.SHEET_API_KEY)
+const sheets = new GoogleSheetsAPI(process.env.GOOGLE_SHEETS_ID, process.env.GOOGLE_API_KEY)
 
 // ✅ GitHub client
 const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN })
@@ -191,3 +191,4 @@ export async function sendWhatsAppMessage(jid, text) {
   if (!sock) return
   await sock.sendMessage(jid, { text })
 }
+
