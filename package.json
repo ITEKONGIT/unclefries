@@ -3,16 +3,17 @@
   "version": "1.0.0",
   "type": "module",
   "description": "WhatsApp Ordering Bot for Uncle's Fries",
-  "main": "index.js",
+  "main": "wabot.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js"
+    "start": "node wabot.js",
+    "dev": "nodemon wabot.js"
   },
   "dependencies": {
     "@whiskeysockets/baileys": "^6.7.7",
     "axios": "^1.7.2",
     "express": "^4.18.2",
-    "pino": "^8.14.1"
+    "pino": "^8.14.1",
+    "qrcode-terminal": "^0.12.0"
   },
   "keywords": [
     "whatsapp",
