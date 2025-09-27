@@ -1,7 +1,7 @@
 import express from "express"
 import bodyParser from "body-parser"
 import crypto from "crypto"
-import { sendWhatsAppMessage, startBot, getLatestQR } from "./waBot.js"
+import { sendWhatsAppMessage, startBot } from "./waBot.js"
 
 const app = express()
 app.use(bodyParser.json())
@@ -35,15 +35,8 @@ app.post("/api/paystack/webhook", (req, res) => {
 // ✅ Root check
 app.get("/", (req, res) => res.send("🚀 UncleFries Bot is running!"))
 
-// ✅ Serve QR for WhatsApp login
-app.get("/qr", (req, res) => {
-  const qr = getLatestQR()
-  if (!qr) return res.send("✅ Already connected or no QR available")
-  res.type("text/plain").send(qr)
-})
+// ✅ Let waBot.js attach /qr route
+startBot(app)
 
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => console.log(`🚀 Server running on ${PORT}`))
-
-// ✅ Start bot
-startBot()
