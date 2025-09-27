@@ -1,14 +1,15 @@
 import makeWASocket, { useMultiFileAuthState } from "@whiskeysockets/baileys"
 import P from "pino"
-import qrcode from "qrcode-terminal"
+import qrcode from "qrcode"
 import axios from "axios"
 import GoogleSheetsAPI from "./sheets.js"
 
 let sock
+let latestQR = null
 const userState = {}
 const sheets = new GoogleSheetsAPI(process.env.SHEET_ID, process.env.SHEET_API_KEY)
 
-export async function startBot() {
+export async function startBot(app) {
   // Persistent auth in Railway volume
   const { state, saveCreds } = await useMultiFileAuthState("/app/auth")
 
@@ -25,11 +26,28 @@ export async function startBot() {
   sock.ev.on("connection.update", (update) => {
     const { connection, qr } = update
     if (qr) {
-      console.log("📱 Scan this QR to log in:")
-      qrcode.generate(qr, { small: true })
+      latestQR = qr
+      console.log("📱 New QR generated (scan via /qr endpoint)")
     }
     if (connection === "open") console.log("✅ Bot connected to WhatsApp!")
   })
+
+  // ✅ Web endpoint to show QR as PNG in browser
+  if (app) {
+    app.get("/qr", async (req, res) => {
+      if (!latestQR) {
+        return res.send("❌ No QR available. Bot may already be connected.")
+      }
+      try {
+        const qrImage = await qrcode.toBuffer(latestQR, { type: "png" })
+        res.writeHead(200, { "Content-Type": "image/png" })
+        res.end(qrImage)
+      } catch (err) {
+        console.error("QR generation error:", err)
+        res.status(500).send("❌ Could not generate QR.")
+      }
+    })
+  }
 
   // Message handler
   sock.ev.on("messages.upsert", async ({ messages }) => {
