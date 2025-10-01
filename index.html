@@ -381,6 +381,88 @@
             transform: translateX(5px);
         }
 
+        /* Nugget Section */
+        .nugget-section {
+            padding: 100px 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .nugget-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(0, 255, 127, 0.15) 0%, transparent 50%);
+            z-index: 0;
+        }
+
+        .nugget-title {
+            font-size: 3rem;
+            font-weight: 900;
+            margin-bottom: 40px;
+            background: linear-gradient(45deg, var(--neon-green), var(--white), var(--green));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+            animation: glow 3s infinite alternate;
+        }
+
+        .egg {
+            width: 120px;
+            height: 180px;
+            background: var(--white);
+            border-radius: 50% / 60% 60% 40% 40%;
+            margin: 0 auto;
+            cursor: pointer;
+            position: relative;
+            box-shadow: 0 0 20px var(--neon-green);
+            transition: transform 0.3s ease;
+        }
+
+        .egg:hover {
+            transform: scale(1.1);
+        }
+
+        .egg.cracked {
+            animation: crack 1s forwards;
+        }
+
+        @keyframes crack {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05) rotate(5deg);
+            }
+            100% {
+                transform: scale(0.9) rotate(-5deg);
+                opacity: 0.5;
+            }
+        }
+
+        .nugget-message {
+            margin-top: 30px;
+            font-size: 1.6rem;
+            color: var(--neon-white);
+            opacity: 0;
+            transition: opacity 1s ease;
+            text-shadow: 0 0 10px var(--neon-green);
+        }
+
+        .nugget-message.reveal {
+            opacity: 1;
+        }
+
+        .hidden {
+            display: none;
+        }
+
         /* Particle Effects */
         .particles {
             position: absolute;
@@ -592,6 +674,15 @@
         </div>
     </section>
 
+    <!-- Nugget Section -->
+    <section class="nugget-section">
+        <div class="container">
+            <h2 class="nugget-title">Crack an Egg for a Nugget of Encouragement!</h2>
+            <div id="egg" class="egg"></div>
+            <div id="nugget-message" class="nugget-message hidden"></div>
+        </div>
+    </section>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const messages = document.querySelectorAll('.message');
@@ -600,14 +691,17 @@
             
             // Function to show a specific message
             function showMessage(index) {
+                // Hide all messages
                 messages.forEach(message => {
                     message.classList.remove('active');
                 });
                 
+                // Remove active class from all indicators
                 indicators.forEach(indicator => {
                     indicator.classList.remove('active');
                 });
                 
+                // Show the selected message and indicator
                 messages[index].classList.add('active');
                 indicators[index].classList.add('active');
                 
@@ -686,6 +780,546 @@
             }
             
             createParticles();
+
+            // Nugget feature
+            const nuggets = [
+                "Everything is working out the way it’s meant to be.",
+                "Good things are coming.",
+                "The world is lucky to have you.",
+                "There’s always another day ahead.",
+                "You are important.",
+                "Today is going to be a good day.",
+                "The future is bright and full of goodness.",
+                "You can trust your intuition.",
+                "You deserve the life you want for yourself.",
+                "It’s all worth it.",
+                "Life is good.",
+                "Your hard work is noticed and appreciated.",
+                "You can handle it.",
+                "You are growing stronger every day.",
+                "The universe has your back.",
+                "This life has abundant blessings in store.",
+                "You are radiant.",
+                "Your effort is more than enough.",
+                "You are right where you need to be at this moment.",
+                "Your dreams will become your reality.",
+                "You are creating your best self every day.",
+                "The past does not determine the future.",
+                "It is okay to change.",
+                "You can let go of what no longer has a place in your life.",
+                "Things are looking up.",
+                "The planet is watching out for you.",
+                "You can release the negativity and stress from this day.",
+                "You are in a safe environment.",
+                "You make the universe brighter and fuller.",
+                "The sun is shining for you.",
+                "People love you and care about you.",
+                "Younger you would be so proud of you today.",
+                "Success is in your path.",
+                "You can choose happiness.",
+                "You are allowed to take a break.",
+                "The universe is happy you’re here.",
+                "Asking for help is good for you.",
+                "You deserve respect.",
+                "There is always space for you.",
+                "You can lean on the earth, and it will support you.",
+                "There is beauty in change.",
+                "Today is another step closer to greatness.",
+                "Your future will come to you when it’s ready.",
+                "There is nothing you cannot overcome.",
+                "Your resilience is taking you where you want to be in the universe.",
+                "You can stay true to yourself, even when others are hurtful or try to tear you down.",
+                "You are strong and capable.",
+                "The best days are yet to come.",
+                "You inspire me every single day.",
+                "I love the life we have together.",
+                "You are worthy.",
+                "I value your judgment.",
+                "You make me laugh.",
+                "You are so talented.",
+                "You impress and inspire everyone you meet.",
+                "You have learned so much since I met you.",
+                "You are so thoughtful.",
+                "Your presence is comforting and reassuring.",
+                "I believe in you. And I always will.",
+                "You are doing an amazing job.",
+                "You always encourage me.",
+                "You have taught me so much while we have been together.",
+                "You are a positive role model.",
+                "You create a positive impact in this world.",
+                "Your masculine energy is powerful.",
+                "You are great at showing love.",
+                "People look up to you.",
+                "You deserve success.",
+                "Good vibes are coming your way.",
+                "Today is going to be the best.",
+                "You are my safe person.",
+                "You have great style.",
+                "You can trust me.",
+                "You can be yourself around me.",
+                "You are good for me.",
+                "You are an amazing partner.",
+                "It is healthy to be afraid.",
+                "Your perspective is unique and worthwhile.",
+                "You can always pick up and start again.",
+                "I respect you.",
+                "You make me proud.",
+                "I trust your advice and wisdom.",
+                "You are fun to be around.",
+                "You deserve to be shown off.",
+                "You are doing good now and improving with every day.",
+                "I have your back.",
+                "You are a positive influence for so many.",
+                "You attract success.",
+                "You are worth taking care of.",
+                "You are significant.",
+                "You radiate positivity.",
+                "Your dream life is on its way.",
+                "You are beautiful.",
+                "You are a light in the universe.",
+                "You will heal from hardship.",
+                "You dazzle me more and more each day.",
+                "You are inspirational.",
+                "Big things are in your future.",
+                "You attract kind people into your circle.",
+                "You are loved.",
+                "You are a great partner.",
+                "The future is worth working towards.",
+                "You make me smile.",
+                "I trust you and your judgment.",
+                "You make smart decisions.",
+                "You are valued.",
+                "You will succeed.",
+                "You are perfect just as you are.",
+                "You are doing amazing.",
+                "I look up to you.",
+                "Your feminine energy is powerful.",
+                "You are creative.",
+                "You can be whoever you want to be.",
+                "Your smile is contagious.",
+                "You are a work of art.",
+                "You don’t have to pretend around me.",
+                "You bring out my best self.",
+                "You are important to me.",
+                "Your life is overflowing with potential.",
+                "You deserve to be treated with kindness.",
+                "You are valuable in your highs and your lows.",
+                "I love spending time with you.",
+                "Goodness follows you wherever you go.",
+                "You make me happy.",
+                "I love your sense of humor.",
+                "You are strong and independent.",
+                "You are so caring.",
+                "You will get what you want.",
+                "Today will be a positive day.",
+                "You are the definition of both inner and outer beauty.",
+                "You impress me on a daily basis.",
+                "You are heroic.",
+                "There will always be space for your voice.",
+                "You are a great friend.",
+                "You are a good supporter.",
+                "You can make it happen.",
+                "Wonderful things are in store for you.",
+                "I see your hard work.",
+                "You make every day more pleasant.",
+                "You are worth it.",
+                "People count on you.",
+                "You are admired.",
+                "You are appreciated just the way you are.",
+                "You are achieving great things.",
+                "Your energy is infectious.",
+                "You are intelligent.",
+                "My best memories are with you.",
+                "You are worth making time for.",
+                "You give amazing advice.",
+                "This life will reward you generously.",
+                "You will receive all the love you give and more.",
+                "You are more than what people think of you.",
+                "Great things are in your future.",
+                "You will reach all your goals this year.",
+                "Your friendship helps me feel confident.",
+                "You are often in my thoughts.",
+                "The universe is watching out for you.",
+                "Your friendship is invaluable.",
+                "So much joy and beauty are ahead of you in this life.",
+                "You are understanding and empathetic.",
+                "You can choose you.",
+                "You fill my days with laughter.",
+                "You deserve to find pure and unfaltering love.",
+                "I enjoy your personality.",
+                "I like every version of you that I’ve gotten to know.",
+                "You are successful.",
+                "You are a great listener.",
+                "You have many positive attributes to be admired.",
+                "You make an impact in my life.",
+                "You are tough.",
+                "You will make it through.",
+                "You will reap many blessings.",
+                "No one but you is in charge of your thoughts.",
+                "I admire your care and compassion.",
+                "I am doing a good job.",
+                "I am making a difference.",
+                "I love myself the way that I am.",
+                "I am valuable.",
+                "I am all that I need.",
+                "I am on the right path.",
+                "I like myself.",
+                "Every challenge I face is really an opportunity for greatness.",
+                "I am proud of my past self.",
+                "I am worthy of love.",
+                "I will enjoy today.",
+                "I am capable of making smart and well-informed decisions for myself.",
+                "I am allowed to take breaks.",
+                "I accept my body as it is and give it the rest and nourishment it needs.",
+                "I am empowered to create change in my own life.",
+                "I choose happiness.",
+                "I am the best version of myself.",
+                "I am courageous.",
+                "I am not defined by what other people think of me.",
+                "I am my biggest supporter.",
+                "I am not",
+                "All is well.",
+                "All will be well.",
+                "I am worthy of Love.",
+                "I deserve Love.",
+                "I accept myself the way I am.",
+                "My body is healing constantly.",
+                "Every day, in every way, I am becoming better, better, and better.",
+                "I am blessed with all my wants and needs.",
+                "My affirmations are always working for me.",
+                "Money flows to me easily and effortlessly.",
+                "I always have enough money.",
+                "I am a money magnet.",
+                "I am a Love magnet.",
+                "Everyone loves me.",
+                "I love everyone.",
+                "I am loved by all.",
+                "I am lovable.",
+                "I am worthy.",
+                "I am worthy of all the good that life has to offer.",
+                "Life is good to me.",
+                "Money is good to me.",
+                "I have a healthy relationship with money.",
+                "Success comes easy to me.",
+                "I am deserving of success.",
+                "I am healthy.",
+                "I feel loved by all.",
+                "I am good.",
+                "All is well in my life.",
+                "All will be well in my life.",
+                "Everything works out fine in the end for me.",
+                "Everything works in my favour.",
+                "The universe works in my favour always.",
+                "I matter.",
+                "I love myself.",
+                "I am kind to myself.",
+                "I love and accept myself the way I am.",
+                "I am brave.",
+                "I am courageous.",
+                "I am doing good.",
+                "I am self sufficient.",
+                "I am kind to others.",
+                "Others are kind to me.",
+                "Help always comes when I seek it.",
+                "I am good on my own.",
+                "I deserve all the good that life has to offer.",
+                "I am powerful on my own.",
+                "I think positive thoughts.",
+                "I think good of others.",
+                "Others think good of me always.",
+                "I let go of all my stress.",
+                "I am emotionally healthy.",
+                "I take care of my health.",
+                "I take care of my well being.",
+                "I talk to myself positively.",
+                "I am always encouraging of myself and of others.",
+                "I am happy.",
+                "I always get what I want.",
+                "I am thankful for all I have.",
+                "I attract all the good in my life.",
+                "I wish others well.",
+                "Others wish me well always.",
+                "I am a magnet for everything good.",
+                "I am blessed.",
+                "I am abundant.",
+                "My future is manifesting constantly.",
+                "The universe is working constantly in my favour.",
+                "Miracles come easy to me.",
+                "I am a magnet for love.",
+                "I believe in myself.",
+                "I do what’s best for me.",
+                "Others work in my favor.",
+                "My life is constantly upgrading.",
+                "I am always learning new things.",
+                "I am always moving onwards and upwards.",
+                "I look forward to the future.",
+                "I am constantly working towards the future that I want.",
+                "I let go of my worries and stress.",
+                "I attract all the positive in my life.",
+                "I embrace all my emotions.",
+                "I am constantly working on improving my health.",
+                "I am at peace.",
+                "As I say yes to life, Life says yes to me.",
+                "I feel safe all the time.",
+                "I can handle uncertainty.",
+                "My thoughts are valid.",
+                "My feelings and emotions are valid.",
+                "I am capable of managing my future.",
+                "I am self sufficient.",
+                "The only validation I need is my own.",
+                "I trust in my abilities.",
+                "I am worthy of all the joy and happiness.",
+                "I am good enough.",
+                "I am capable of great things.",
+                "I am my best motivator.",
+                "I inspire myself and others.",
+                "I believe in other people.",
+                "Other people believe in me.",
+                "I am proud of my journey.",
+                "I forgive myself and others.",
+                "My past was not a mistake.",
+                "I don’t fight with myself.",
+                "I let go of emotions that cause me stress.",
+                "My feelings are valid.",
+                "I respond wisely and positively.",
+                "I let go of all my anger.",
+                "I am a loving being.",
+                "I am a peaceful being.",
+                "I don’t let my ego block my growth.",
+                "I let go of all self limiting beliefs.",
+                "I think good of myself.",
+                "I think good about others.",
+                "I am grateful for all that I have.",
+                "I feel joy in other people’s happiness.",
+                "I celebrate the success of others.",
+                "I approve of myself the way I am.",
+                "I am constantly improving.",
+                "I am always working in my favour.",
+                "My existence makes this world a better place.",
+                "I make this world a better place.",
+                "I am always surrounded by positive people.",
+                "I attract positivity in my life always.",
+                "I am abundant.",
+                "Money is drawn to me.",
+                "Love is drawn to me.",
+                "Everything I touch turns to gold.",
+                "I release all my mental blocks.",
+                "I think positively about money.",
+                "I let money into my life.",
+                "I let love into my life.",
+                "My heart is open.",
+                "I attract fulfilling relationships.",
+                "I see love wherever I go.",
+                "I am worthy of the compliments I receive.",
+                "I am worthy of the love I receive.",
+                "I am always a priority for myself and for others.",
+                "I deserve a lifelong love.",
+                "I am the creator of my reality.",
+                "I am living the life of my dreams.",
+                "My thoughts are uplifting.",
+                "I have a wonderful life.",
+                "I am grateful for the life I have.",
+                "I manifest all the good in my life.",
+                "My manifestations are powerful.",
+                "I get everything I want.",
+                "My wants and needs are always met.",
+                "I have high positive energy.",
+                "My vibrations are always positive.",
+                "What I seek is seeking me.",
+                "I support my goals.",
+                "I support my dreams.",
+                "I am consistent with my efforts.",
+                "The life I desire is possible.",
+                "I trust the universe.",
+                "I trust in myself and my abilities.",
+                "I am always attracting money in my life.",
+                "I have a dream job.",
+                "Abundance comes to me in expected and unexpected ways.",
+                "My life is good.",
+                "I am grateful for everything good in my life.",
+                "I am my own inspiration.",
+                "I am a magnet for my dreams and goals.",
+                "Good things are always happening in my life.",
+                "I am ok with not feeling ok.",
+                "I am successful.",
+                "I am confident.",
+                "I am self motivated.",
+                "I am a happy person.",
+                "I love myself and care for myself.",
+                "I am competent, smart and able.",
+                "I am constantly growing and moving forward.",
+                "Everyday I am becoming a better version of myself.",
+                "I am always attracting good luck.",
+                "I attract abundance quickly and effortlessly.",
+                "I attract love quickly and effortlessly.",
+                "I am worthy of receiving the good.",
+                "I am always doing my best.",
+                "I am strong enough to overcome challenges.",
+                "I am beautiful.",
+                "I am perfect just the way I am.",
+                "My voice is important and heard.",
+                "I am accepting of myself and others.",
+                "I am always in the right place at the right time.",
+                "Affirmations work like magic for me.",
+                "I am grateful to be alive.",
+                "I choose to be happy, today and everyday.",
+                "I am blessed.",
+                "I am a blessing.",
+                "I am intelligent.",
+                "I am proud of who I am.",
+                "I am proud of my journey.",
+                "I let go of self limiting beliefs and patterns.",
+                "I am open to receiving love.",
+                "I am comfortable in my own skin.",
+                "I am open to new experiences.",
+                "I trust in my abilities.",
+                "I inhale positivity and exhale negativity",
+                "I am valued exactly as I am.",
+                "I am capable of accomplishing anything I put my mind to.",
+                "I uplift the people around me.",
+                "I can create all I truly desire.",
+                "I deserve abundance in all parts of my life.",
+                "My love and compassion create harmony in my life.",
+                "I am grateful for the changing of the seasons and the changes in my life.",
+                "I take time each day to nurture my spirit and find serenity within.",
+                "I deserve to be happy.",
+                "I am in tune with my innermost feelings.",
+                "My negative thoughts and feelings are transformed into love.",
+                "I give thanks for the life I am creating.",
+                "I embrace the new possibilities life brings me.",
+                "I’m grateful for the past experiences that helped expand my understanding of myself.",
+                "I am comfortable with who I am.",
+                "I open my mind and heart to the world around me.",
+                "Health, wealth, and harmony are entering my life.",
+                "I move through life with confidence.",
+                "I trust myself, my instincts, and the love in my heart.",
+                "I am confident in the path I’m walking.",
+                "I do what I love and love what I do.",
+                "Each new day is full of possibility.",
+                "I am happy. I am healing. I am loved.",
+                "I am open to the messages the universe has for me today.",
+                "I am filled with vitality and ready for the day.",
+                "Being firm in my boundaries is a kindness to myself.",
+                "I have all the happiness I need to experience joy every day.",
+                "Each moment of this new day brings opportunities for happiness.",
+                "My life is not a race; there is time for pleasure and reflection.",
+                "I am ready to ask for what I want and need.",
+                "My heart, mind, and life are open to change.",
+                "I deserve the most amazing day.",
+                "I have the wisdom and strength to overcome any challenge that today brings.",
+                "My greatest strength comes from being my authentic self.",
+                "I choose to be connected to the world, not separate from it.",
+                "Prosperity flows to me.",
+                "I make choices that are right for me.",
+                "Every day, I am making my dreams a reality.",
+                "I can confront my fears and leave behind the things I no longer need.",
+                "Rest is essential to my health and happiness.",
+                "I am full of creative ideas.",
+                "I am proud of who I am.",
+                "I am full of love for myself and others.",
+                "I am enough.",
+                "I am doing the best I can.",
+                "I am worthy of respect and compassion.",
+                "I am beautiful inside and out.",
+                "I am taking positive steps every day.",
+                "I am talented.",
+                "I am powerful.",
+                "I am perfect the way I am.",
+                "I am proud of my accomplishments.",
+                "I am at peace with my past.",
+                "I am more powerful than I know.",
+                "I am full of gratitude for my life.",
+                "I am succeeding in life.",
+                "I am resilient.",
+                "I am prepared for my dreams to come true.",
+                "I am the only person responsible for my happiness.",
+                "I am capable of overcoming life’s challenges.",
+                "I will never lose infinite hope. — Inspired by Martin Luther King, Jr.",
+                "I will never become silent about things that matter. — Inspired by Martin Luther King, Jr.",
+                "The time is always right to do what is right. — Inspired by Martin Luther King, Jr.",
+                "I measure my success by the obstacles I’ve overcome. — Inspired by Booker T. Washington",
+                "I am an asset to my community.",
+                "Abundance is my birthright.",
+                "I move through life with ease.",
+                "I have permission to create and enforce boundaries.",
+                "I surround myself with people who support me.",
+                "I am grateful for my journey and its lessons.",
+                "I relax my mind, release false stories, and find peace.",
+                "I can leave any negative situation whenever I choose.",
+                "I trust my strength and ability to overcome obstacles.",
+                "My thoughts and actions align with my goals, creating a life I love.",
+                "I am deserving of love, respect, and happiness, and I embrace them now.",
+                "I trust my inner wisdom to guide me toward what’s best for me.",
+                "I am capable of handling challenges and trust my resilience.",
+                "I release negative thoughts and emotions, focusing on positivity and gratitude.",
+                "I am at peace with my past and confident in creating a positive future.",
+                "I am whole, healthy, and complete. — Oprah Winfrey",
+                "I am worthy of love and respect, and I deserve kindness. — Jennifer Aniston",
+                "I trust in my ability to overcome challenges and grow stronger. — Emma Watson",
+                "I focus on positivity and control my thoughts and emotions. — Deepika Padukone",
+                "I am surrounded by love and support, and I am never alone. — Lady Gaga",
+                "I am deeply grateful for my body, my health, and my unique talents.",
+                "My body is beautiful, exactly the way it is.",
+                "There is more to life than worrying about my weight. I’m ready to experience it.",
+                "I trust the wisdom of my body.",
+                "I am feeling fabulous and confident in my body.",
+                "Every day, I am becoming a better version of myself.",
+                "I am grateful for my body and treat it with love and care.",
+                "My body is a stunning masterpiece, beautiful and unique in every way, and I honor it just the way it is.",
+                "I choose to free myself from worry and fully embrace life, knowing my value is beyond the scale.",
+                "I radiate joy and positivity, confident that true beauty comes from within.",
+                "My body deserves nourishment, exercise, and self-care, and I treat it with love and respect.",
+                "I am valued exactly as I am.",
+                "I am capable of accomplishing anything I put my mind to.",
+                "I uplift the people around me.",
+                "I can create all I truly desire.",
+                "I deserve abundance in all parts of my life.",
+                "My love and compassion create harmony in my life.",
+                "I am grateful for the changing of the seasons and the changes in my life.",
+                "I take time each day to nurture my spirit and find serenity within.",
+                "I deserve to be happy.",
+                "I am in tune with my innermost feelings.",
+                "My negative thoughts and feelings are transformed into love.",
+                "I give thanks for the life I am creating.",
+                "I embrace the new possibilities life brings me.",
+                "I’m grateful for the past experiences that helped expand my understanding of myself.",
+                "I am comfortable with who I am.",
+                "I open my mind and heart to the world around me.",
+                "Health, wealth, and harmony are entering my life.",
+                "I move through life with confidence.",
+                "I trust myself, my instincts, and the love in my heart.",
+                "I am confident in the path I’m walking.",
+                "I do what I love and love what I do.",
+                "Each new day is full of possibility.",
+                "I am happy. I am healing. I am loved.",
+                "I am open to the messages the universe has for me today.",
+                "I am filled with vitality and ready for the day.",
+                "Being firm in my boundaries is a kindness to myself.",
+                "I have all the happiness I need to experience joy every day.",
+                "Each moment of this new day brings opportunities for happiness.",
+                "My life is not a race; there is time for pleasure and reflection.",
+                "I am ready to ask for what I want and need.",
+                "My heart, mind, and life are open to change.",
+                "I deserve the most amazing day.",
+                "I have the wisdom and strength to overcome any challenge that today brings.",
+                "My greatest strength comes from being my authentic self.",
+                "I choose to be connected to the world, not separate from it.",
+                "Prosperity flows to me.",
+                "I make choices that are right for me."
+            ]; 
+            const egg = document.getElementById('egg');
+            const nuggetMessage = document.getElementById('nugget-message');
+
+            egg.addEventListener('click', () => {
+                egg.classList.add('cracked');
+                setTimeout(() => {
+                    egg.style.display = 'none';
+                    const randomIndex = Math.floor(Math.random() * nuggets.length);
+                    nuggetMessage.innerHTML = `<p>${nuggets[randomIndex]}</p>`;
+                    nuggetMessage.classList.remove('hidden');
+                    nuggetMessage.classList.add('reveal');
+                }, 1000);
+            });
         });
     </script>
 </body>
